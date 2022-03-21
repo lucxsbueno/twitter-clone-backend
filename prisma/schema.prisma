@@ -11,13 +11,25 @@ datasource db {
 }
 
 model User {
+  id         String    @id @default(uuid())
+  name       String
+  email      String    @unique
+  username   String    @unique
+  password   String
+  followedBy User[]    @relation("UserFollows", references: [id])
+  following  User[]    @relation("UserFollows", references: [id])
+  tweets     Tweet[]
+  Profile    Profile[]
+  Reply      Reply[]
+}
+
+model Profile {
   id       String  @id @default(uuid())
-  name     String
-  email    String  @unique
-  username String  @unique
+  user     User    @relation(fields: [userId], references: [id])
+  picture  String
   verified Boolean @default(false)
-  password String
-  tweets   Tweet[]
+  bio      String
+  userId   String
 }
 
 model Tweet {
@@ -26,4 +38,13 @@ model Tweet {
   date   DateTime @default(now())
   user   User?    @relation(fields: [userId], references: [id])
   userId String?
+  Reply  Reply[]
+}
+
+model Reply {
+  id      String @id @default(uuid())
+  user    User   @relation(fields: [userId], references: [id])
+  userId  String
+  tweet   Tweet  @relation(fields: [tweetId], references: [id])
+  tweetId String
 }
